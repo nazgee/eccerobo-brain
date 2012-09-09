@@ -27,9 +27,6 @@ Config::Config(int argc, char **argv) :
 				{ "verbose", no_argument, &mSilent, 1 },
 				/* These options don't set a flag.
 				 We distinguish them by their indices. */
-				{ "device", required_argument, NULL, 'd' },
-				{ "baud", required_argument, NULL, 'b' },
-				{ "parity", required_argument, NULL, 'p' },
 				{ "port", required_argument, NULL, 't' },
 				{ 0, 0, 0, 0 }
 			};
@@ -37,7 +34,7 @@ Config::Config(int argc, char **argv) :
 		/* getopt_long stores the option index here. */
 		int option_index = 0;
 
-		c = getopt_long(argc, argv, "d:b:p:t:", long_options, &option_index);
+		c = getopt_long(argc, argv, "t:", long_options, &option_index);
 
 		/* Detect the end of the options. */
 		if (c == -1)
@@ -54,21 +51,6 @@ Config::Config(int argc, char **argv) :
 			std::cout << std::endl;
 			break;
 
-		case 'd': {
-			serial.device = optarg;
-		} break;
-		case 'p': {
-			serial.parity.set(optarg);
-		} break;
-		case 'b': {
-			errno = 0;
-			char* str = optarg;
-			serial.baud_rate = strtol(optarg, &str, 10);
-
-			if (errno || (optarg == str)) {
-				throw std::invalid_argument("Invalid baud rate given");
-			}
-		} break;
 		case 't': {
 			mPort = optarg;
 		} break;
@@ -93,7 +75,9 @@ Config::Config(int argc, char **argv) :
 }
 
 std::string Config::toString() {
-	return serial.toString();
+	std::string ret("port=");
+	ret += getPort();
+	return ret;
 }
 
 }

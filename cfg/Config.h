@@ -9,7 +9,6 @@
 #define CONFIG_H_
 
 #include <string>
-#include "SerialConfig.h"
 
 namespace ecce {
 class Config {
@@ -17,7 +16,6 @@ class Config {
 	std::string mPort;
 public:
 	Config(int argc, char **argv);
-	SerialConfig serial;
 	bool isVerbose() { return !mSilent; }
 	std::string toString();
 
