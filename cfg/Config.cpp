@@ -18,7 +18,7 @@ namespace ecce {
 
 Config::Config(int argc, char **argv) :
 	mSilent(0),
-	mPort("1111") {
+	mSpineServer("localhost:1111") {
 	int c;
 
 	while (1) {
@@ -27,14 +27,14 @@ Config::Config(int argc, char **argv) :
 				{ "verbose", no_argument, &mSilent, 1 },
 				/* These options don't set a flag.
 				 We distinguish them by their indices. */
-				{ "port", required_argument, NULL, 't' },
+				{ "server", required_argument, NULL, 's' },
 				{ 0, 0, 0, 0 }
 			};
 
 		/* getopt_long stores the option index here. */
 		int option_index = 0;
 
-		c = getopt_long(argc, argv, "t:", long_options, &option_index);
+		c = getopt_long(argc, argv, "s:", long_options, &option_index);
 
 		/* Detect the end of the options. */
 		if (c == -1)
@@ -51,8 +51,8 @@ Config::Config(int argc, char **argv) :
 			std::cout << std::endl;
 			break;
 
-		case 't': {
-			mPort = optarg;
+		case 's': {
+			mSpineServer = optarg;
 		} break;
 		case '?':
 			/* getopt_long already printed an error message. */
@@ -75,8 +75,8 @@ Config::Config(int argc, char **argv) :
 }
 
 std::string Config::toString() {
-	std::string ret("port=");
-	ret += getPort();
+	std::string ret("server=");
+	ret += getSpineServer();
 	return ret;
 }
 

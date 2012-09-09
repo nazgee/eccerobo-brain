@@ -13,14 +13,14 @@
 namespace ecce {
 class Config {
 	int mSilent;
-	std::string mPort;
+	std::string mSpineServer;
 public:
 	Config(int argc, char **argv);
 	bool isVerbose() { return !mSilent; }
 	std::string toString();
 
-	std::string getPort() const {
-		return mPort;
+	std::string getSpineServer() const {
+		return mSpineServer;
 	}
 };
 }
