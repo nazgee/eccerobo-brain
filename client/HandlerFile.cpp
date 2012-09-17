@@ -81,7 +81,7 @@ int HandlerFile::read(const void *p, size_t want) {
 	while (want - sofar) {
 		ret = ::read(mFile, (uint8_t*) p, want - sofar);
 		if (ret == 0) {
-			NFO << "EOF reached, sofar=" << sofar << std::endl;
+//			NFO << "EOF reached, sofar=" << sofar << std::endl;
 			return sofar; /* EOF */
 		}
 		if (ret <= 0) {
