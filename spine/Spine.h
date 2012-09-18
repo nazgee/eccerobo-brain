@@ -18,14 +18,16 @@ class Spine {
 	std::mutex mutex;
 	std::unique_ptr<osock::Parser> mParser;
 	osock::StringMessage mMessage;
-	osock::ChainedMessage mReply;
+	osock::StringMessage mACK;
+	osock::ChainedMessage mReplyWithACK;
 public:
 	Spine(std::string server);
 	virtual ~Spine() {
 	}
 
 	int getInt(std::string cmd);
-	osock::StringMessage set(std::string cmd);
+	osock::StringMessage setWithReply(std::string cmd);
+	void set(std::string cmd);
 };
 } // namespace ecce
 #endif /* SPINE_H_ */

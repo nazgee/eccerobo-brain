@@ -7,27 +7,40 @@
 
 #include "Spine.h"
 #include "SpineException.h"
+#include "../misc/Logger.h"
 
 #include <boost/lexical_cast.hpp>
 
 namespace ecce {
+
+static Logger logger("Spine");
+
 Spine::Spine(std::string server) :
 	mParser(new osock::Parser(osock::BIOSocket::PopulateClientBIO(server))),
 	mMessage(""),
-	mReply() {
+	mACK(""),
+	mReplyWithACK() {
 
 	// replies are sent in a form: <STATUS> <VALUE><EOL>
 	// we need to setup a message chain covering it
-	mReply.AddLink(new osock::StringMessage("", " ")); // "<STATUS> "
-	mReply.AddLink(new osock::StringMessage("")); //"<VALUE><EOL>"
-	mReply.LinksClose();
+	mReplyWithACK.AddLink(new osock::StringMessage("", " ")); // "<STATUS> "
+	mReplyWithACK.AddLink(new osock::StringMessage("")); //"<VALUE><EOL>"
+	mReplyWithACK.LinksClose();
 }
 
 int Spine::getInt(std::string cmd) {
-	return boost::lexical_cast<int>(set(cmd));
+	int val;
+	osock::StringMessage msg = setWithReply(cmd);
+	try {
+		val = boost::lexical_cast<int>(msg.getString().c_str());
+	} catch (boost::bad_lexical_cast& e) {
+		ERR << "could not convert \'" << msg.getString() << "'" << std::endl;
+		throw e;
+	}
+	return val;
 }
 
-osock::StringMessage Spine::set(std::string cmd) {
+void Spine::set(std::string cmd) {
 	std::lock_guard<std::mutex> autolock(mutex);
 
 	// prepare message to send
@@ -35,14 +48,29 @@ osock::StringMessage Spine::set(std::string cmd) {
 
 	// message-reply
 	mParser->Send(mMessage);
-	mParser->Receive(mReply);
+	mParser->Receive(mACK);
+
+	if (mACK.getString() != "OK") {
+		throw SpineException("Spine reply error - " + mACK.getString());
+	}
+}
+
+osock::StringMessage Spine::setWithReply(std::string cmd) {
+	std::lock_guard<std::mutex> autolock(mutex);
+
+	// prepare message to send
+	mMessage.setString(cmd);
+
+	// message-reply
+	mParser->Send(mMessage);
+	mParser->Receive(mReplyWithACK);
 
 	// retrieve status
-	const osock::StringMessage& status = dynamic_cast<const osock::StringMessage&>(mReply.getLink(0));
+	const osock::StringMessage& status = dynamic_cast<const osock::StringMessage&>(mReplyWithACK.getLink(0));
 	// retrieve value
-	const osock::StringMessage& value = dynamic_cast<const osock::StringMessage&>(mReply.getLink(1));
+	const osock::StringMessage& value = dynamic_cast<const osock::StringMessage&>(mReplyWithACK.getLink(1));
 
-	if (status != "OK") {
+	if (status.getString() != "OK") {
 		throw SpineException("Spine reply error - " + status.getString());
 	}
 	return value;
