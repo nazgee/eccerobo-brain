@@ -16,7 +16,7 @@
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/circular_buffer.hpp>
-
+#include <spine/Spine.h>
 
 #include "misc/Logger.h"
 
@@ -24,32 +24,7 @@ using namespace ecce;
 static Logger logger("brain");
 
 
-osock::StringMessage message ("set engine 1");
-osock::ChainedMessage chain;
-osock::Parser* spine;
-osock::BIOSocket_p clientBIO;
-
-int readValue(std::string cmd) {
-	message.setString(cmd);
-	spine->Send(message);
-	spine->Receive(chain);
-	osock::StringMessage& strmsg = (osock::StringMessage&)chain.getLink(1);
-	std::string val = strmsg.getString();
-
-//	clientBIO.get()->setReadTimeout(100);
-//	try {
-//		osock::StringMessage dummy("");
-////		std::cout << "trying weird shit..." << std::endl;
-//		spine->ReceiveWithoutRetry(dummy);
-//	} catch (osock::BIO::RecoverableException& e) {
-////		std::cout << "...well, there was no data" << std::endl;
-//	}
-//	clientBIO.get()->setReadTimeout(0);
-
-	int value = atoi(val.c_str());
-	std::cout << "value=" << value << " from "<< val <<std::endl;
-	return value;
-}
+Spine *spine;
 
 int main(int argc, char **argv) {
 	Config cfg(argc, argv);
@@ -59,32 +34,21 @@ int main(int argc, char **argv) {
 		std::cout << cfg.toString() << std::endl;
 	}
 
-	chain.AddLink(new osock::StringMessage("", " "));
-	chain.AddLink(new osock::StringMessage(""));
-	chain.LinksClose();
+	spine = new Spine(cfg.getSpineServer());
 
-	clientBIO = osock::BIOSocket::PopulateClientBIO(cfg.getSpineServer());
-	spine = new osock::Parser(clientBIO);
 
 	int16_t engine;
 	int cm;
-	int loop = 0;
-#define MAX_MEASUREMENT 300
 	boost::circular_buffer<int> measurements(3);
-
 	do {
-		loop++;
-
 		std::cout << "=============" << std::endl;
 
-//		int min = MAX_MEASUREMENT;
 		int min = 0;
 		for (unsigned int i = 0; i < 3; i++) {
 			usleep(10 * 1000);
-			cm = readValue("get range");
+			cm = spine->getInt("get range");
 			if (cm  == -EINVAL)
-				cm = MAX_MEASUREMENT;
-//			min = std::min(min, cm);
+				cm = 300;
 			min += cm;
 		}
 		min /= 3;
@@ -98,10 +62,7 @@ int main(int argc, char **argv) {
 			avg += *it;
 		}
 		avg /= measurements.size();
-		std::cout << "cm= " << min << " | " << (osock::StringMessage&)chain.getLink(1) << std::endl;
-
-		engine = readValue("get engine");
-		std::cout << "engine= " << engine << " | " << (osock::StringMessage&)chain.getLink(1) << std::endl;
+		engine = spine->getInt("get engine");
 
 		int speed = 0;
 		if (min > 150) {
@@ -121,51 +82,32 @@ int main(int argc, char **argv) {
 
 		if (min > 30) {
 			if (engine < 0) {
-				std::cout << "sleeping before FWD "<< std::endl;
-				message.setString("set engine 0");
-				spine->Send(message);
-				spine->Receive(message);
+				std::cout << "sleeping before FORWARD "<< std::endl;
+				spine->set("set engine 0");
 				usleep(500 * 1000);
 			}
 
 			if (engine <= 0 && speed < 32000) {
-				message.setString("set engine 32000");
-				spine->Send(message);
-				spine->Receive(message);
+				spine->set("set engine 32000");
 				usleep(500 * 1000);
 			}
 
 			std::stringstream ss;
 			ss << speed;
-			message.setString("set engine " + ss.str());
-			std::cout << message.getString() << std::endl;
-			spine->Send(message);
-			spine->Receive(message);
+			spine->set("set engine " + ss.str());
 
 			std::stringstream ssturn;
 			ssturn << (100 + 50 - std::min(avg, 100)) * 500 / 100;
-			std::cout << "turn= " << ssturn.str() << std::endl;
-			message.setString(std::string("set turn ") + ssturn.str());
-			std::cout << message.getString() << std::endl;
-			spine->Send(message);
-			spine->Receive(message);
+			spine->set("set turn " + ssturn.str());
 		} else {
 			if (engine > 0) {
-				std::cout << "sleeping before BWD "<< std::endl;
-				message.setString("set engine 0");
-				spine->Send(message);
-				spine->Receive(message);
+				std::cout << "sleeping before BACK "<< std::endl;
+				spine->set("set engine 0");
 				usleep(500 * 1000);
 			}
 
-			message.setString("set engine -25000");
-			spine->Send(message);
-			spine->Receive(message);
-
-			message.setString("set turn -500");
-			spine->Send(message);
-			spine->Receive(message);
-
+			spine->set("set turn -500");
+			spine->set("set engine -25000");
 			usleep( 50 * 1000);
 		}
 	} while (1);

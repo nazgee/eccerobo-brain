@@ -9,6 +9,7 @@ CXXFLAGS = -O2 -g -Wall -fmessage-length=0 -std=c++0x \
 OBJS =	brain.o \
 	cfg/Config.o \
 	misc/Logger.o \
+	spine/Spine.o \
 	client/Handler.o
 
 ifeq ($(ARCH),arm)
