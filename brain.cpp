@@ -39,19 +39,22 @@ int main(int argc, char **argv) {
 
 	int16_t engine;
 	int cm;
+	int back_counter = 0;
 	boost::circular_buffer<int> measurements(3);
 	do {
 		std::cout << "=============" << std::endl;
 
 		int min = 0;
 		for (unsigned int i = 0; i < 3; i++) {
-			usleep(10 * 1000);
+			usleep(20 * 1000);
 			cm = spine->getInt("get range");
 			if (cm  == -EINVAL)
 				cm = 300;
 			min += cm;
+			std::cout << " cm= " << cm;
 		}
 		min /= 3;
+		std::cout << std::endl;
 
 		measurements.push_front(min);
 
@@ -62,53 +65,85 @@ int main(int argc, char **argv) {
 			avg += *it;
 		}
 		avg /= measurements.size();
-		engine = spine->getInt("get engine");
+		engine = spine->getInt("get speed");
 
 		int speed = 0;
-		if (min > 150) {
-			speed = 32000;
-		} else if (min > 125) {
-			speed = 26000;
-		} else if (min > 100) {
-			speed = 25000;
-		} else if (min > 75) {
-			speed = 24000;
-		} else if (min > 50) {
-			speed = 22000;
-		} else if (min > 30) {
-			speed = 20000;
+		if (avg > 120) {
+			speed = 4;
+		} else if (avg > 75) {
+			speed = 3;
+		} else if (avg > 40) {
+			speed = 2;
+		} else if (avg > 20) {
+			speed = 1;
 		}
-		std::cout << "speed= " << speed << std::endl;
 
-		if (min > 30) {
+		std::cout << "speed= " << engine << std::endl;
+		std::cout << "turn= " <<spine->getInt("get turn") << std::endl;
+		std::cout << "range= " << avg << std::endl;
+		std::cout << "safe_speed=" << speed << std::endl;
+
+		if (avg > 20) {
+			spine->set("set turn 0");
+
 			if (engine < 0) {
 				std::cout << "sleeping before FORWARD "<< std::endl;
-				spine->set("set engine 0");
-				usleep(500 * 1000);
+				spine->set("set speed 0");
+				usleep(1000 * 1000);
 			}
 
-			if (engine <= 0 && speed < 32000) {
-				spine->set("set engine 32000");
-				usleep(500 * 1000);
+			if (engine <= 0 && speed < 2) {
+				spine->set("set speed 4");
+				usleep(100 * 1000);
 			}
 
 			std::stringstream ss;
 			ss << speed;
-			spine->set("set engine " + ss.str());
+			spine->set("set speed " + ss.str());
 
-			std::stringstream ssturn;
-			ssturn << (100 + 50 - std::min(avg, 100)) * 500 / 100;
-			spine->set("set turn " + ssturn.str());
+//			std::stringstream ssturn;
+//			int dist = std::min(avg, 100);
+//			int max = 55;
+//			if (dist < max) {
+//				ssturn << ((max - dist) * 4) / (max - 20 + 1) + 1;
+//			} else {
+//				ssturn << 0;
+//			}
+//
+//			spine->set("set turn " + ssturn.str());
 		} else {
 			if (engine > 0) {
+				back_counter = 0;
 				std::cout << "sleeping before BACK "<< std::endl;
-				spine->set("set engine 0");
+				spine->set("set speed 0");
+				spine->set("set turn 0");
+				usleep(1000 * 1000);
+				spine->set("set speed -2");
+				spine->set("set turn -2");
 				usleep(500 * 1000);
+				spine->set("set speed 0");
+				spine->set("set turn 0");
+				usleep(1000 * 1000);
 			}
 
-			spine->set("set turn -500");
-			spine->set("set engine -25000");
-			usleep( 50 * 1000);
+			back_counter++;
+			if (back_counter > 200) {
+				back_counter = 0;
+				sleep(4);
+				std::cout << "sleeping before blind BACK "<< std::endl;
+				spine->set("set speed 0");
+				spine->set("set turn 0");
+				usleep(1000 * 1000);
+				spine->set("set speed -2");
+				spine->set("set turn -2");
+				usleep(500 * 1000);
+				spine->set("set speed 0");
+				spine->set("set turn 0");
+				usleep(1000 * 1000);
+			}
+			spine->set("set turn -2");
+			spine->set("set speed 0");
+			usleep( 20 * 1000);
 		}
 	} while (1);
 
