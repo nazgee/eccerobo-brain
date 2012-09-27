@@ -40,20 +40,20 @@ int main(int argc, char **argv) {
 	int16_t engine;
 	int cm;
 	int back_counter = 0;
-	boost::circular_buffer<int> measurements(3);
+	boost::circular_buffer<int> measurements(2);
 	do {
 		std::cout << "=============" << std::endl;
 
 		int min = 0;
-		for (unsigned int i = 0; i < 3; i++) {
-			usleep(20 * 1000);
+		for (unsigned int i = 0; i < 2; i++) {
 			cm = spine->getInt("get range");
+			usleep(100 * 1000);
 			if (cm  == -EINVAL)
 				cm = 300;
 			min += cm;
 			std::cout << " cm= " << cm;
 		}
-		min /= 3;
+		min /= 2;
 		std::cout << std::endl;
 
 		measurements.push_front(min);

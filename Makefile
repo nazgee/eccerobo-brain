@@ -10,6 +10,7 @@ OBJS =	brain.o \
 	cfg/Config.o \
 	misc/Logger.o \
 	spine/Spine.o \
+	spine/Eye.o \
 	client/Handler.o
 
 ifeq ($(ARCH),arm)
