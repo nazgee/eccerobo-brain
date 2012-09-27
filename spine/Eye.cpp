@@ -6,8 +6,11 @@
  */
 
 #include "Eye.h"
+#include "../misc/Logger.h"
 #include <limits>
 namespace ecce {
+
+static Logger logger("brain");
 
 Eye::Eye(std::string server) :
 	mDistances(5),
@@ -58,10 +61,11 @@ void Eye::measureDist() {
 	mDistances.push_front(meas);
 }
 
-void Eye::run(void* cookie) {
+void Eye::run() {
 	while(1) {
 		measureDist();
 		usleep(10000);
+		//DBG << "foo " << mDistances.front() << std::endl;
 	}
 }
 

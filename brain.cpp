@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits>
+#include <thread>
 
 #include <cfg/Config.h>
 #include <osock-1.0/osock.h>
@@ -16,9 +17,10 @@
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/circular_buffer.hpp>
-#include <spine/Spine.h>
 
 #include "misc/Logger.h"
+#include "spine/Spine.h"
+#include "spine/Eye.h"
 
 using namespace ecce;
 static Logger logger("brain");
@@ -33,6 +35,10 @@ int main(int argc, char **argv) {
 		std::cout << "eccerobo brain is starting..." << std::endl;
 		std::cout << cfg.toString() << std::endl;
 	}
+
+	Eye eye(cfg.getSpineServer());
+	std::thread t(&Eye::run, &eye);
+
 
 	spine = new Spine(cfg.getSpineServer());
 

@@ -13,7 +13,7 @@ namespace ecce {
 class IRunnable {
 public:
 	virtual ~IRunnable() {};
-	virtual void run(void* cookie) = 0;
+	virtual void run() = 0;
 };
 
 } /* namespace ecce */

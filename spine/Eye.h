@@ -29,7 +29,7 @@ public:
 	int calculateMinDistance();
 	int calculateAvgDistance();
 
-	virtual void run(void* cookie);
+	virtual void run();
 };
 
 } /* namespace ecce */
