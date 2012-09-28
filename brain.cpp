@@ -44,35 +44,13 @@ int main(int argc, char **argv) {
 
 
 	int16_t engine;
-	int cm;
 	int back_counter = 0;
-	boost::circular_buffer<int> measurements(2);
 	do {
 		std::cout << "=============" << std::endl;
 
-		int min = 0;
-		for (unsigned int i = 0; i < 2; i++) {
-			cm = spine->getInt("get range");
-			usleep(100 * 1000);
-			if (cm  == -EINVAL)
-				cm = 300;
-			min += cm;
-			std::cout << " cm= " << cm;
-		}
-		min /= 2;
-		std::cout << std::endl;
-
-		measurements.push_front(min);
-
-		int avg = 0;
-		for (boost::circular_buffer<int>::const_iterator it = measurements.begin() ; it !=measurements.end(); ++it)
-		{
-			min = std::min(min, *it);
-			avg += *it;
-		}
-		avg /= measurements.size();
 		engine = spine->getInt("get speed");
 
+		int avg = eye.calculateAvgDistance();
 		int speed = 0;
 		if (avg > 120) {
 			speed = 4;
@@ -92,7 +70,7 @@ int main(int argc, char **argv) {
 		if (avg > 20) {
 			spine->set("set turn 0");
 
-			if (engine < 0) {
+			if (engine <= 0) {
 				std::cout << "sleeping before FORWARD "<< std::endl;
 				spine->set("set speed 0");
 				usleep(1000 * 1000);
