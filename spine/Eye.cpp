@@ -13,7 +13,7 @@ namespace ecce {
 static Logger logger("brain");
 
 Eye::Eye(std::string server) :
-	mDistances(5),
+	mDistances(4),
 	mSpine(server) {
 
 	measureDist();
@@ -58,6 +58,9 @@ int Eye::calculateAvgDistance() {
 void Eye::measureDist() {
 	std::lock_guard<std::mutex> autolock(mutex);
 	int meas = mSpine.getInt("get range");
+	if (meas == -EINVAL) {
+		meas = 300;
+	}
 	mDistances.push_front(meas);
 }
 
@@ -65,7 +68,7 @@ void Eye::run() {
 	while(1) {
 		measureDist();
 		usleep(10000);
-		//DBG << "foo " << mDistances.front() << std::endl;
+		DBG << "=== " << mDistances.front() << " ==="<< std::endl;
 	}
 }
 
