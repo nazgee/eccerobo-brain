@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/circular_buffer.hpp>
+#include <boost/thread.hpp>
 
 #include "misc/Logger.h"
 #include "spine/Spine.h"
@@ -37,8 +38,7 @@ int main(int argc, char **argv) {
 	}
 
 	Eye eye(cfg.getSpineServer());
-	std::thread t(&Eye::run, &eye);
-
+	boost::thread thread( boost::bind(&Eye::run, &eye));
 
 	spine = new Spine(cfg.getSpineServer());
 
