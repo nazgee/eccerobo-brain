@@ -10,14 +10,19 @@
 
 #include <string>
 
+#include "../misc/Logger.h"
+
 namespace ecce {
 class Config {
-	int mSilent;
+	Logger::logLevel mLoglevel;
 	std::string mSpineServer;
 public:
 	Config(int argc, char **argv);
-	bool isVerbose() { return !mSilent; }
 	std::string toString();
+
+	Logger::logLevel getLoglevel() const {
+		return mLoglevel;
+	}
 
 	std::string getSpineServer() const {
 		return mSpineServer;

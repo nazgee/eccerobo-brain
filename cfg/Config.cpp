@@ -17,14 +17,14 @@
 namespace ecce {
 
 Config::Config(int argc, char **argv) :
-	mSilent(0),
-	mSpineServer("localhost:1111") {
+	mLoglevel(Logger::logLevel::logInfo),
+	mSpineServer("localhost:7000") {
 	int c;
 
 	while (1) {
 		static struct option long_options[] = {
 				/* These options set a flag. */
-				{ "verbose", no_argument, &mSilent, 1 },
+				{ "verbosity", required_argument, NULL, 'v' },
 				/* These options don't set a flag.
 				 We distinguish them by their indices. */
 				{ "server", required_argument, NULL, 's' },
@@ -34,7 +34,7 @@ Config::Config(int argc, char **argv) :
 		/* getopt_long stores the option index here. */
 		int option_index = 0;
 
-		c = getopt_long(argc, argv, "s:", long_options, &option_index);
+		c = getopt_long(argc, argv, "s:v:", long_options, &option_index);
 
 		/* Detect the end of the options. */
 		if (c == -1)
@@ -53,6 +53,10 @@ Config::Config(int argc, char **argv) :
 
 		case 's': {
 			mSpineServer = optarg;
+		} break;
+		case 'v': {
+			// XXX this is dirty...
+			mLoglevel = (Logger::logLevel)(Logger::logLevel::logError - atoi(optarg));
 		} break;
 		case '?':
 			/* getopt_long already printed an error message. */

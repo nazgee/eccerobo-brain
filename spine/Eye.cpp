@@ -10,7 +10,7 @@
 #include <limits>
 namespace ecce {
 
-static Logger logger("brain");
+static Logger logger("eye");
 
 Eye::Eye(std::string server) :
 	mDistances(4),

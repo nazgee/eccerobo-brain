@@ -55,8 +55,8 @@ public:
 	} logConfig;
 
 private:
-	static const unsigned int wClass = 20;
-	static const unsigned int wMeth = 25;
+	static const unsigned int wClass = 10;
+	static const unsigned int wMeth = 15;
 	static const unsigned int wFunc = wClass + wMeth + 2; // <Class::Func>
 
 	typedef std::pair<std::string, logConfig> loggerDesc_t;

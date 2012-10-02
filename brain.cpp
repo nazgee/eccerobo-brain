@@ -32,10 +32,10 @@ Spine *spine;
 int main(int argc, char **argv) {
 	Config cfg(argc, argv);
 
-	if (cfg.isVerbose()) {
-		std::cout << "eccerobo brain is starting..." << std::endl;
-		std::cout << cfg.toString() << std::endl;
-	}
+	Logger::ForceLoglevel(cfg.getLoglevel());
+
+	NFO_FUNC << "eccerobo brain is starting..." << std::endl;
+	NFO_FUNC << cfg.toString() << std::endl;
 
 	Eye eye(cfg.getSpineServer());
 	boost::thread thread( boost::bind(&Eye::run, &eye));
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 	int16_t engine;
 	int back_counter = 0;
 	do {
-		std::cout << "=============" << std::endl;
+		DBG_FUNC << "=============" << std::endl;
 
 		engine = spine->getInt("get speed");
 		int avg = eye.calculateAvgDistance();
@@ -61,14 +61,14 @@ int main(int argc, char **argv) {
 			speed = 1;
 		}
 
-		std::cout << "speed= " << engine << std::endl;
-		std::cout << "turn= " <<spine->getInt("get turn") << std::endl;
-		std::cout << "range= " << avg << std::endl;
-		std::cout << "safe_speed=" << speed << std::endl;
+		DBG_FUNC << "speed= " << engine << std::endl;
+		DBG_FUNC << "turn= " <<spine->getInt("get turn") << std::endl;
+		DBG_FUNC << "range= " << avg << std::endl;
+		DBG_FUNC << "safe_speed=" << speed << std::endl;
 
 		if (avg > 30) {
 			if (engine <= 0) {
-				std::cout << "sleeping before FORWARD "<< std::endl;
+				DBG_FUNC << "sleeping before FORWARD "<< std::endl;
 				spine->set("set speed 0");
 				spine->set("set turn 0");
 				usleep(100 * 1000);
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 		} else {
 			if (engine > 0) {
 				back_counter = 0;
-				std::cout << "sleeping before BACK "<< std::endl;
+				DBG_FUNC << "sleeping before BACK "<< std::endl;
 				spine->set("set speed 0");
 				spine->set("set turn 0");
 				usleep(100 * 1000);
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
 
 			if (back_counter > 40) {
 				back_counter = 0;
-				std::cout << "sleeping before blind BACK "<< std::endl;
+				DBG_FUNC << "sleeping before blind BACK "<< std::endl;
 				spine->set("set speed -2");
 				spine->set("set turn -2");
 				usleep(1000 * 1000);
