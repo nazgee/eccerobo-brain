@@ -67,17 +67,10 @@ int main(int argc, char **argv) {
 		std::cout << "safe_speed=" << speed << std::endl;
 
 		if (avg > 30) {
-//			spine->set("set turn 0");
-
 			if (engine <= 0) {
 				std::cout << "sleeping before FORWARD "<< std::endl;
 				spine->set("set speed 0");
 				spine->set("set turn 0");
-				usleep(1000 * 1000);
-			}
-
-			if (engine <= 0 && speed < 2) {
-				spine->set("set speed 4");
 				usleep(100 * 1000);
 			}
 
@@ -97,39 +90,28 @@ int main(int argc, char **argv) {
 			}
 
 			spine->set("set turn " + ssturn.str());
+			usleep( 30 * 1000);
 		} else {
 			if (engine > 0) {
 				back_counter = 0;
 				std::cout << "sleeping before BACK "<< std::endl;
 				spine->set("set speed 0");
 				spine->set("set turn 0");
-				usleep(1000 * 1000);
-//				spine->set("set speed 0");
-//				spine->set("set turn -2");
-//				usleep(500 * 1000);
-//				spine->set("set speed 0");
-//				spine->set("set turn 0");
-//				usleep(1000 * 1000);
+				usleep(100 * 1000);
 			}
 
-			back_counter++;
-			if (back_counter > 10) {
+			if (back_counter > 40) {
 				back_counter = 0;
-//				sleep(4);
 				std::cout << "sleeping before blind BACK "<< std::endl;
-				spine->set("set speed 0");
-				spine->set("set turn 0");
+				spine->set("set speed -2");
+				spine->set("set turn -2");
 				usleep(1000 * 1000);
-//				spine->set("set speed -2");
-//				spine->set("set turn -2");
-//				usleep(500 * 1000);
-//				spine->set("set speed 0");
-//				spine->set("set turn 0");
-//				usleep(1000 * 1000);
+			} else {
+				back_counter++;
+				spine->set("set turn -2");
+				spine->set("set speed 0");
+				usleep( 30 * 1000);
 			}
-			spine->set("set turn -2");
-			spine->set("set speed 0");
-			usleep( 20 * 1000);
 		}
 	} while (1);
 
