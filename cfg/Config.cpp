@@ -25,6 +25,7 @@ Config::Config(int argc, char **argv) :
 		static struct option long_options[] = {
 				/* These options set a flag. */
 				{ "verbosity", required_argument, NULL, 'v' },
+				{ "manual", no_argument, &mManual, 'm' },
 				/* These options don't set a flag.
 				 We distinguish them by their indices. */
 				{ "server", required_argument, NULL, 's' },

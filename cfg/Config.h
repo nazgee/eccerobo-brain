@@ -16,9 +16,14 @@ namespace ecce {
 class Config {
 	Logger::logLevel mLoglevel;
 	std::string mSpineServer;
+	int mManual;
 public:
 	Config(int argc, char **argv);
 	std::string toString();
+
+	bool isManual() const {
+		return mManual;
+	}
 
 	Logger::logLevel getLoglevel() const {
 		return mLoglevel;
