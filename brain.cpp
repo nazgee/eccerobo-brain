@@ -125,8 +125,8 @@ int main(int argc, char **argv) {
 				refresh();
 			}
 
-			mvprintw(1, 0, "                              ");
-			for (int i = 0; i < distance/10; i++) {
+			mvprintw(1, 0, "                                                            ");
+			for (int i = 0; i < distance/5; i++) {
 				mvprintw(1, i, "#");
 			}
 
