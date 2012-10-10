@@ -8,9 +8,8 @@
 #ifndef HUD_H_
 #define HUD_H_
 
-#include "spine/Spine.h"
-#include "spine/Eye.h"
-#include <ncurses.h>
+#include "../spine/Spine.h"
+#include "../spine/Eye.h"
 
 namespace ecce {
 class HUD {
@@ -19,7 +18,6 @@ class HUD {
 	int no_press;
 	int speed;
 	int turn;
-	WINDOW *mTextWindow;
 
 	void setSpeed(int s);
 	void setTurn(int t);

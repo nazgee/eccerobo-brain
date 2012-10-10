@@ -15,7 +15,7 @@
 #include "spine/Eye.h"
 #include "misc/Logger.h"
 #include "cfg/Config.h"
-#include "HUD.h"
+#include "HUD/HUD.h"
 
 using namespace ecce;
 static Logger logger("brain");

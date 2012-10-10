@@ -11,7 +11,8 @@ OBJS =	brain.o \
 	misc/Logger.o \
 	spine/Spine.o \
 	spine/Eye.o \
-	HUD.o \
+	HUD/HUD.o \
+	HUD/Window.o \
 	client/Handler.o
 
 ifeq ($(ARCH),arm)
@@ -24,7 +25,7 @@ else
 CXXFLAGS += $(shell pkg-config --cflags libmodbus)
 endif
 
-LIBS += -lmodbus -losock-1.0 -lrt -lboost_thread-mt -lcurses
+LIBS += -lncursesw -lmodbus -losock-1.0 -lrt -lboost_thread-mt
 
 
 $(TARGET):	$(OBJS)
