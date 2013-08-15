@@ -8,10 +8,15 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
+#include <stddef.h>
+
+extern "C"
 #ifdef __arm__
 #include <curses.h>
 #else
+{
 #include <ncursesw/cursesw.h>
+}
 #endif
 
 namespace ecce {
