@@ -31,17 +31,21 @@ int main(int argc, char **argv) {
 	NFO_FUNC << "eccerobo brain is starting..." << std::endl;
 	NFO_FUNC << cfg.toString() << std::endl;
 
-	Eye eye(cfg.getSpineServer());
-	boost::thread thread( boost::bind(&Eye::run, &eye));
+//	Eye eye(cfg.getSpineServer());
+//	boost::thread thread( boost::bind(&Eye::run, &eye));
 
 	spine = new Spine(cfg.getSpineServer());
 
 
 	if (cfg.isManual()) {
-		HUD hud(spine, &eye);
+//		HUD hud(spine, &eye);
+		HUD hud(spine, 0);
 		hud.go();
 		exit(0);
 	}
+
+	Eye eye(cfg.getSpineServer());
+	boost::thread thread( boost::bind(&Eye::run, &eye));
 
 
 	int16_t engine;

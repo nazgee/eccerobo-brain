@@ -176,16 +176,19 @@ void HUD::go(void) {
 			speed = 0;
 		}
 
-		int distance = eye->calculateAvgDistance();
-		if (distance < 25) {
-			mvprintw(6, 30, "emergency stop!");
-			speed = 0;
+		int distance = 666;
+		if (eye) {
+			distance = eye->calculateAvgDistance();
+			if (distance < 25) {
+				mvprintw(6, 30, "emergency stop!");
+				speed = 0;
+			}
+			mvprintw(1, 0, "                                                            ");
+			for (int i = 0; i < distance/5; i++) {
+				mvprintw(1, i, "#");
+			}
 		}
 
-		mvprintw(1, 0, "                                                            ");
-		for (int i = 0; i < distance/5; i++) {
-			mvprintw(1, i, "#");
-		}
 
 		setTurn(turn);
 		setSpeed(speed);
